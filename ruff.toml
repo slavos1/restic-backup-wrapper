@@ -1,0 +1,4 @@
+# add Ruff customization as desired
+line-length = 120
+
+select = ["E", "F", "I"]

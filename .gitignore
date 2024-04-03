@@ -1,0 +1,8 @@
+*.py[cod]
+build/
+*.egg-info/
+_coverage
+test_report.html
+htmlcov.dev/
+log*/*.log
+log*/*.log.bz2

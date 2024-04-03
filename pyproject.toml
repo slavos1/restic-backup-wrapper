@@ -1,0 +1,82 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "restic-backup-wrapper"
+dynamic = ["version"]
+description = "Use a custom config for many backups"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+keywords = ['cli', 'command-line', 'command line', 'tool', "backup"]
+authors = [
+  { name = "slavos1", email = "1396260+slavos1@users.noreply.github.com" },
+]
+# https://pythonhosted.org/an_example_pypi_project/setuptools.html#classifiers
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Utilities",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+
+dependencies = [
+  # add your deps
+  "loguru==0.7.2",
+]
+
+[project.scripts]
+restic-backup-wrapper-cli = "restic_backup_wrapper.cli:cli"
+
+[tool.hatch.build.targets.sdist]
+packages = ["restic_backup_wrapper", "tests"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["restic_backup_wrapper"]
+
+[project.urls]
+Homepage = "https://github.com/slavos1/restic-backup-wrapper"
+Documentation = "https://github.com/slavos1/restic-backup-wrapper/README.md"
+Issues = "https://github.com/slavos1/restic-backup-wrapper/issues"
+Source = "https://github.com/slavos1/restic-backup-wrapper"
+
+[tool.hatch.version]
+path = "restic_backup_wrapper/__init__.py"
+
+[tool.hatch.envs.default]
+extra-dependencies = [
+  "pytest",
+  "pytest-html",
+  "pytest-random-order",
+  "pytest-cov",
+]
+
+[tool.hatch.envs.default.env-vars]
+PYTHONPATH = "."
+
+[tool.hatch.envs.default.scripts]
+_pytest = 'pytest -vv --tb=auto --strict-markers --random-order-bucket=class --log-format="%(asctime)s %(name)s:%(funcName)s %(levelname)s %(message)s" --log-date-format="%Y-%m-%d %H:%M:%S" --log-level=DEBUG --html=test_report.html --self-contained-html'
+test = '_pytest tests {args}'
+cov = '_pytest --cov=restic_backup_wrapper --cov-config=coverage.cfg --cov-report html:htmlcov.dev --cov-report term tests {args}'
+# XXX hatch ensures 'python' here is from its local virtual environment
+cli = 'restic-backup-wrapper-cli {args}'
+help = 'cli --help'
+
+[tool.hatch.envs.types]
+extra-dependencies = ["mypy>=1.0.0"]
+
+[tool.hatch.envs.types.scripts]
+check = "mypy --strict --install-types --non-interactive {args:restic_backup_wrapper tests}"
+
+[tool.hatch.envs.hatch-static-analysis]
+config-path = "ruff_defaults.toml"
