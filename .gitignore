@@ -6,3 +6,5 @@ test_report.html
 htmlcov.dev/
 log*/*.log
 log*/*.log.bz2
+.vscode/settings.json
+min.sh

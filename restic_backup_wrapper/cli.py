@@ -1,4 +1,4 @@
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, Namespace
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, FileType, Namespace
 from pathlib import Path
 
 from loguru import logger
@@ -24,15 +24,7 @@ def parse_args() -> Namespace:
         default="logs",
     )
 
-    commands = parser.add_subparsers(dest="command", required=True)
-
-    parse_command = commands.add_parser(
-        "generate",
-        formatter_class=HELP_FORMATTER,
-        help="Parse data",
-        description="Parse data from input",
-    )
-    parse_command.add_argument(
+    parser.add_argument(
         "-i",
         "--input-file",
         help="Input TOML file",
@@ -40,13 +32,18 @@ def parse_args() -> Namespace:
         metavar="PATH",
         required=True,
     )
+    parser.add_argument(
+        "-o",
+        "--output-file",
+        help="Output file; if not specified or -, it is stdout",
+        type=FileType("w"),
+        metavar="PATH|-",
+    )
+    parser.add_argument(
+        "-n", "--dry-run", action="store_true", help="Generate dry run for restic backup"
+    )
 
     return parser.parse_args()
-
-
-DISPATCH = {
-    "generate": generate,
-}
 
 
 def cli() -> None:
@@ -54,4 +51,4 @@ def cli() -> None:
     setup_logging(args)
     logger.debug("args={}", args)
     # handle the args
-    DISPATCH[args.command](args)
+    generate(args)

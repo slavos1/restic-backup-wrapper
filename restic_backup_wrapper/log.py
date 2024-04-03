@@ -1,7 +1,7 @@
 import sys
 from argparse import Namespace
 
-from icecream import ic
+from icecream import ic as _ic
 from loguru import logger
 
 LOG_CONSOLE_FORMAT = (
@@ -20,12 +20,12 @@ LOG_FILE_FORMAT = (
 )
 
 
-def log_to_loguru(s):
+def log_to_loguru(s: str) -> None:
     logger.debug(s)
 
 
-def enable_icecream(prefix: str = ""):
-    ic.configureOutput(prefix=prefix, outputFunction=log_to_loguru)
+def enable_icecream(prefix: str = "") -> None:
+    _ic.configureOutput(prefix=prefix, outputFunction=log_to_loguru)
 
 
 def setup_logging(args: Namespace) -> None:
@@ -61,3 +61,7 @@ def setup_logging(args: Namespace) -> None:
             ),
         )
     logger.configure(handlers=handlers)
+
+
+# XXX this explicit export is to make mypy happy
+ic = _ic

@@ -1,0 +1,9 @@
+relative-to = "~/"
+group-by = "host,paths,tags"
+# will be added to all backups
+exclude = ['.git']
+
+[my-folder-one]
+dir = "~/my-folder-one"
+tags = ['mobile', 'voice', 'audio']
+exclude = [".hg"]

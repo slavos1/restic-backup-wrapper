@@ -16,3 +16,16 @@ mypy:
 
 build:
 	${HATCH} build
+
+min:
+	${HATCH} run cli -l '' -d -i min.toml -o min.sh
+
+gen:
+	${HATCH} run cli -l '' -q -i ~/my_shell_home/bin/backup.toml
+
+# local install
+local:
+	-rm -rf dist/
+	hatch build
+	pipx install --force dist/*.whl
+	restic-backup-wrapper-cli --version

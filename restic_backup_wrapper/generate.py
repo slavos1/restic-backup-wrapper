@@ -1,7 +1,7 @@
 import re
 from argparse import Namespace
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, Iterable, List, Tuple
 
 import tomli
 from jinja2 import Template
@@ -9,6 +9,8 @@ from loguru import logger
 
 from .log import ic
 
+# name as come from <_io.TextIOWrapper name='<stdout>' mode='w' encoding='utf-8'>
+STDOUT_DISPLAY_NAME = "<stdout>"
 RESTIC_COMMAND_DEFAULT = "restic"
 COMMAND_TEMPLATE = """
 {% if relative_to %}
@@ -23,27 +25,37 @@ COMMAND_TEMPLATE = """
 
 backup {{ dir }}
 
+{% if dry_run %}
+--dry-run
+{% endif %}
+
+{% if group_by %}
+--group-by '{{group_by}}'
+{% endif %}
+
+{% if tags %}
+--tag '{{ tags|join(',') }}'
+{% endif %}
+
 {% for i in exclude %}
 -e '{{i}}'
 {% endfor %}
 
-{% if relative_to %}
-)
-{% endif %}
-
+{% if relative_to %}){% endif %}
 """
 
 
 def is_folder_config(d: Any) -> bool:
     try:
-        return "dir" in d
+        d["dir"]
     except Exception:
         return False
+    return True
 
 
-def _merge_and_remove(key, a, b):
-    value_a = []
-    value_b = []
+def _merge_and_remove(key: str, a: Dict[str, Any], b: Dict[str, Any]) -> List[Any]:
+    value_a: List[Any] = []
+    value_b: List[Any] = []
     if key in a:
         value_a = a[key]
         del a[key]
@@ -53,16 +65,29 @@ def _merge_and_remove(key, a, b):
     return sorted(set(value_a + value_b))
 
 
-def _generate_command(global_settings, key, value, template: str = COMMAND_TEMPLATE) -> str:
+def _generate_command(
+    global_settings: Dict[str, Any],
+    key: str,
+    value: Dict[str, Any],
+    dry_run: bool = False,
+    template: str = COMMAND_TEMPLATE,
+) -> str:
     # XXX make all variable names with underscore (restic-command => restic_command)
     settings = dict(global_settings)
     exclude = _merge_and_remove("exclude", settings, value)
+    tags = _merge_and_remove("tags", settings, value)
 
     # make 'dir' relative to the global value
-    relative_to = settings.get('relative_to')
+    relative_to = settings.get("relative-to")
+    dest = Path(value["dir"])
+    if not dest.expanduser().exists():
+        logger.warning(
+            ("Path {} does not exist, you may have" " a problem when actually running the command"),
+            dest,
+        )
     if relative_to:
         try:
-            value['dir'] = Path(value['dir']).relative_to(Path(relative_to))
+            value["dir"] = dest.relative_to(Path(relative_to))
         except ValueError as exc:
             logger.debug("{} -- ignoring", exc)
             relative_to = None
@@ -72,11 +97,14 @@ def _generate_command(global_settings, key, value, template: str = COMMAND_TEMPL
         for k, v in (
             {
                 **settings,
-                "exclude": exclude,
+                "exclude": exclude,  # they are sorted
                 "key": key,
                 **value,
                 # XXX must be last to override settings
                 "relative_to": relative_to,
+                "dry_run": dry_run,
+                "dest": dest,
+                "tags": tags,  # they are sorted
             }.items()
         )
     }
@@ -99,8 +127,9 @@ def _generate_command(global_settings, key, value, template: str = COMMAND_TEMPL
     )
 
 
-def _generate(toml: Path):
-    def _iter():
+def _generate(toml: Path, dry_run: bool = False) -> Dict[str, str]:
+    def _iter() -> Iterable[Tuple[str, str]]:
+        logger.info("Reading {}", toml)
         with toml.open("rb") as inp:
             d = tomli.load(inp)
         logger.debug("d={}", d)
@@ -108,10 +137,13 @@ def _generate(toml: Path):
         global_settings.setdefault("restic-command", RESTIC_COMMAND_DEFAULT)
         ic(global_settings)
         for key, value in filter(lambda t: is_folder_config(t[1]), d.items()):
-            yield key, _generate_command(global_settings, key, value)
+            yield key, _generate_command(global_settings, key, value, dry_run)
 
     return dict(_iter())
 
 
 def generate(args: Namespace) -> None:
-    logger.info("Parse command, args={}", args)
+    logger.info("Writing to {}", args.output_file.name if args.output_file else STDOUT_DISPLAY_NAME)
+    print(
+        "\n".join(sorted(_generate(args.input_file, args.dry_run).values())), file=args.output_file
+    )

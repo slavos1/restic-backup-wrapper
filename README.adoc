@@ -1,0 +1,136 @@
+= restic-backup-wrapper tool
+:source-language: shell
+:source-highlighter: pygments
+:pygments-css: class
+:icons: font
+:opt: (optional)
+:cli: restic-backup-wrapper-cli
+:rt: restic
+
+{cli} is a too that uses a custom TOML config for many backups and generates `{rt} backup` commands suitable for piping to a shell.
+
+== How it works
+
+{cli} takes a TOML file with a structure like:
+
+.`min.toml`
+----
+include::min.toml[]
+----
+
+and generates https://restic.readthedocs.io/en/latest/040_backup.html[`{rt} backup`] commands.
+
+.Example (logs not shown)
+----
+$ restic-backup-wrapper-cli -l '' -q -i min.toml
+(cd ~/ && restic backup my-folder-one --group-by 'host,paths,tags' --tag 'audio,mobile,voice' -e '.git' -e '.hg' )
+----
+
+== Prerequisites
+
+* https://hatch.pypa.io/[`hatch`] -- install via `pipx hatch` or `pip install --user hatch`
+
+== Project organization
+
+----
+├── LICENSE
+├── Makefile
+├── coverage.cfg        <- setup for test coverage ('tox -e cov')
+├── pyproject.toml      <- instead of setup.py, recognized by tox too
+├── README.md           <- this file
+├── tests
+│   └── test_foo.py     <- write your own tests here
+└── restic_backup_wrapper   <- your package files
+    ├── __init__.py
+    ├── ...
+----
+
+== How to use
+
+----
+# run the CLI
+hatch run cli
+make cli
+
+# run the CLI help
+hatch run help
+make help
+
+# or append any CLI-defined args, like --help
+hatch run cli --help
+make cli EXTRA='...'
+
+# run mypy
+hatch run types:check
+make mypy
+
+# run tests
+make
+hatch run test
+
+# go to the venv shell
+hatch shell
+----
+
+== Local install and run
+
+----
+rm -rf dist/
+hatch build
+pipx install dist/*.whl
+restic-backup-wrapper-cli --version
+restic-backup-wrapper-cli --help
+
+# or you can use
+make local
+----
+
+== Input file format
+
+`-i`/`--input-file` is a TOML file of the following format.
+
+=== Global parameters
+
+`restic-repo` {opt}::
+If specified, `{rt} -r <restic-repo>` will be generated.
+If not specified `-r XXX` will omitted.
+I do not use this flag as my `{rt}` is actually a custom alias/wrapper that sets my {rt} repo password as an environment variable.
+
+`relative-to` {opt}::
+If specified, all `dir` paths (see below) that are relative to this path will be backed up as relative.
++
+====
+If `relative-to="X"` and a `dir="X/Y"` then the generated command will be `(cd X && {rt} backup Y ...)`
+====
+
+`group-by` {opt}::
+Translates to --group-by {rt} flag.
+It will be omitted from the generated command if not specified.
+
+`exclude` {opt}::
+Add these exclude patterns to every generated command.
+The folder-specific excludes will be merged with this exclude, if any.
+
+=== Backed up folders
+
+Each key of the form `[my-dir]` represents a folder to be backed up and for which a `{rt} backup` command will be generated.
+
+For each such entry, {cli} recognizes these parameters.
+
+`dir` (mandatory)::
+Folder to back up.
+
+`tags` {opt}::
+A list of tags; they will used in `{rt} backup --tag ...`.
+
+`exclude` {opt}::
+Exclude patterns relevant to this folder.
+These patterns, if any, will be merged with the global `exclude`.
+
+== On {rt} and relative paths
+
+According to https://forum.restic.net/t/backing-up-restoring-relative-paths/744/2[the {rt} author], {rt} keeps relative and absolute paths.
+It is not obvious from `{rt} snaphots`, where absolute paths are shown; but running `{rt} ls <snapshot-id>` for snapshot backed up from a relative path, `/` is shown as the "parent" folder; not the full folder.
+
+**So one should imagine how `tar` does it.**
+
