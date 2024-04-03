@@ -1,6 +1,7 @@
 import sys
 from argparse import Namespace
 
+from icecream import ic
 from loguru import logger
 
 LOG_CONSOLE_FORMAT = (
@@ -19,7 +20,16 @@ LOG_FILE_FORMAT = (
 )
 
 
+def log_to_loguru(s):
+    logger.debug(s)
+
+
+def enable_icecream(prefix: str = ""):
+    ic.configureOutput(prefix=prefix, outputFunction=log_to_loguru)
+
+
 def setup_logging(args: Namespace) -> None:
+    enable_icecream()
     if args.quiet:
         level = "WARNING"
     elif args.debug:

@@ -1,6 +1,21 @@
 # restic-backup-wrapper readme
 
-Use a custom config for many backups
+Use a custom config for many backups.
+
+It takes a TOML file with a structure like:
+```toml
+relative_to = "~/"
+group-by = "host,paths,tags"
+# will be added to all backups
+exclude = ['.git']
+
+[my-folder-one]
+dir = "~/my-folder-one"
+tags = ['mobile', 'voice', 'audio']
+exclude = [".hg"]
+```
+
+and generates [`restic backup`](https://restic.readthedocs.io/en/latest/040_backup.html) commands for you to run.
 
 ## Prerequisites
 
