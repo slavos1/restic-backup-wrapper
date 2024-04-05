@@ -55,8 +55,10 @@ readme.docbook:
 	$(call adoc,readme.docbook,-b docbook)
 
 README.md: readme.docbook
-	echo -e "# restic-backup-wrapper tool\n\n_Generated from [source_readme.adoc](source_readme.adoc)._\n\n[[toc]]\n\n" > $@.tmp
+	echo -e '# restic-backup-wrapper tool\n\n_Generated from [source_readme.adoc](source_readme.adoc)._\n\n<!-- START doctoc generated TOC please keep comment here to allow auto update -->\n<!-- END doctoc generated TOC please keep comment here to allow auto update -->\n\n' > $@.tmp
 	pandoc -f docbook -t gfm $< -o - >> $@.tmp
+# doctoc: pnpm i -g doctoc	
+	doctoc --notitle --github $@.tmp
 	mv $@.tmp $@
 
 doc-md: README.md

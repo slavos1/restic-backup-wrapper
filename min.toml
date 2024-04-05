@@ -1,15 +1,19 @@
 # minimal sample config
-relative-to = "~/"
+relative-to = "/home/user"
 group-by = "host,paths,tags"
 # will be added to all backups
 exclude = ['.git']
 
 [my-folder-one]
-dir = "~/my-folder-one"
+dir = "/home/user/my-folder-one"
 tags = ['mobile', 'voice', 'audio']
 exclude = [".hg"]
 
 [folder-with-one-backup]
-dir = "~/my-mail"
+dir = "/home/user/my-mail"
 tags = ['email']
 keep-last = 1
+
+[absolute-path]
+dir = "/mnt/data"
+tags = ['external']
