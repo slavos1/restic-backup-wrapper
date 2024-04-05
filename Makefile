@@ -34,7 +34,7 @@ local:
 	restic-backup-wrapper-cli --version
 
 min.sh::
-	${HATCH} run cli -i min.toml| sed '/^\s*$$/d' > $@.tmp
+	${HATCH} run cli -i min.toml| sed '/^\s*$$/d'|sed 's/ on .*/ on .../' > $@.tmp
 	mv $@.tmp $@
 
 help.txt::
@@ -42,7 +42,7 @@ help.txt::
 	mv $@.tmp $@
 
 define adoc
-	asciidoctor -a toc=left -a min-sh=min.sh -a doc-help=help.txt ${2} -o ${1} readme.adoc
+	asciidoctor -a toc=left -a min-sh=min.sh -a doc-help=help.txt ${2} -o ${1} source_readme.adoc
 endef
 
 doc-html: min.sh help.txt
@@ -55,7 +55,7 @@ readme.docbook:
 	$(call adoc,readme.docbook,-b docbook)
 
 README.md: readme.docbook
-	echo -e "_Generated from [readme.adoc](readme.adoc)._\n\n" > $@.tmp
+	echo -e "_Generated from [source_readme.adoc](source_readme.adoc)._\n\n" > $@.tmp
 	pandoc -f docbook -t gfm $< -o - >> $@.tmp
 	mv $@.tmp $@
 

@@ -146,5 +146,5 @@ _So one should imagine how `tar` does it._
 
 When writing documentation, I run `make doc-devel` and preview the generated HTML.
 
-Once ready to commit, I run `make doc` to generate link:README.md[README.md] file from link:readme.adoc[readme.adoc] (and included files).
+Once ready to commit, I run `make doc` to generate link:README.md[README.md] file from link:source_readme.adoc[source_readme.adoc] (and included files).
 
