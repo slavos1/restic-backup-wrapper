@@ -1,3 +1,4 @@
+# minimal sample config
 relative-to = "~/"
 group-by = "host,paths,tags"
 # will be added to all backups
@@ -7,3 +8,8 @@ exclude = ['.git']
 dir = "~/my-folder-one"
 tags = ['mobile', 'voice', 'audio']
 exclude = [".hg"]
+
+[folder-with-one-backup]
+dir = "~/my-mail"
+tags = ['email']
+keep-last = 1

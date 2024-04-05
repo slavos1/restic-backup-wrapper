@@ -8,3 +8,6 @@ log*/*.log
 log*/*.log.bz2
 .vscode/settings.json
 min.sh
+readme.docbook
+readme.html
+help.txt

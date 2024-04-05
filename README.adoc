@@ -7,43 +7,40 @@
 :cli: restic-backup-wrapper-cli
 :rt: restic
 
-{cli} is a too that uses a custom TOML config for many backups and generates `{rt} backup` commands suitable for piping to a shell.
+*{cli}* is a command-line tool that generates `{rt} backup` commands from a TOML config file.
 
-== How it works
+The output is suitable for piping to a (Posix) shell.
 
-{cli} takes a TOML file with a structure like:
+CAUTION: _Please note although this script is provided in the hope it will be link:LICENSE[useful], use caution when running it.
+Always review the generated {rt} commands, as improper use could potentially damage your backup data._
+
+== Example
+
+Given a TOML file:
 
 .`min.toml`
+[,toml]
 ----
 include::min.toml[]
 ----
 
-and generates https://restic.readthedocs.io/en/latest/040_backup.html[`{rt} backup`] commands.
+{cli} generates https://restic.readthedocs.io/en/latest/040_backup.html[`{rt} backup`] commands (logs not shown):
 
-.Example (logs not shown)
 ----
-$ restic-backup-wrapper-cli -l '' -q -i min.toml
-(cd ~/ && restic backup my-folder-one --group-by 'host,paths,tags' --tag 'audio,mobile,voice' -e '.git' -e '.hg' )
+include::{min-sh}[]
 ----
+
+== Syntax
+
+[,text]
+----
+include::{doc-help}[]
+----
+
 
 == Prerequisites
 
 * https://hatch.pypa.io/[`hatch`] -- install via `pipx hatch` or `pip install --user hatch`
-
-== Project organization
-
-----
-├── LICENSE
-├── Makefile
-├── coverage.cfg        <- setup for test coverage ('tox -e cov')
-├── pyproject.toml      <- instead of setup.py, recognized by tox too
-├── README.md           <- this file
-├── tests
-│   └── test_foo.py     <- write your own tests here
-└── restic_backup_wrapper   <- your package files
-    ├── __init__.py
-    ├── ...
-----
 
 == How to use
 
@@ -70,16 +67,23 @@ hatch run test
 
 # go to the venv shell
 hatch shell
+
+# write documentation
+make doc
+
+# increase version
+hatch version <new-version>
 ----
 
 == Local install and run
 
+[subs="attributes"]
 ----
 rm -rf dist/
 hatch build
 pipx install dist/*.whl
-restic-backup-wrapper-cli --version
-restic-backup-wrapper-cli --help
+{cli} --version
+{cli} --help
 
 # or you can use
 make local
@@ -115,22 +119,32 @@ The folder-specific excludes will be merged with this exclude, if any.
 
 Each key of the form `[my-dir]` represents a folder to be backed up and for which a `{rt} backup` command will be generated.
 
-For each such entry, {cli} recognizes these parameters.
+For each such entry, {cli} recognizes these parameters:
 
 `dir` (mandatory)::
-Folder to back up.
+Path to back up; if `relative-to` is set in the global parameters to a path `X`, `dir` will end up backed up as relative to `X` if it is a descendant path of `X`; otherwise it is kept as is.
 
 `tags` {opt}::
-A list of tags; they will used in `{rt} backup --tag ...`.
+A list of tags; tags `['x','a tag with space']` will end up as `{rt} backup ... --tag 'a tag with space,x' ...` (spaces in the tags are allowed).
 
 `exclude` {opt}::
 Exclude patterns relevant to this folder.
 These patterns, if any, will be merged with the global `exclude`.
 
-== On {rt} and relative paths
+`keep-last` (optional; added in version `0.2.0`)::
+Generate _another_ line to keep only the specified number of snapshots, something like `{rt} ... forget --prune --keep-last <N> --path <full-folder-path>`.
+
+== {rt} and relative paths
 
 According to https://forum.restic.net/t/backing-up-restoring-relative-paths/744/2[the {rt} author], {rt} keeps relative and absolute paths.
-It is not obvious from `{rt} snaphots`, where absolute paths are shown; but running `{rt} ls <snapshot-id>` for snapshot backed up from a relative path, `/` is shown as the "parent" folder; not the full folder.
+It is not obvious from `{rt} snaphots` where only absolute paths are shown.
+Running `{rt} ls <snapshot-id>` for a snapshot backed up from a relative path will show `/` as the "parent" path (and not the full path).
 
-**So one should imagine how `tar` does it.**
+_So one should imagine how `tar` does it._
+
+== Writing documentation
+
+When writing documentation, I run `make doc-devel` and preview the generated HTML.
+
+Once ready to commit, I run `make doc` to generate link:README.md[README.md] file from link:README.adoc[README.adoc] (and included files).
 

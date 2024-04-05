@@ -1,4 +1,7 @@
 HATCH=hatch
+SHELL=bash
+
+.PHONY: README.md readme.docbook
 
 all: test
 
@@ -29,3 +32,33 @@ local:
 	hatch build
 	pipx install --force dist/*.whl
 	restic-backup-wrapper-cli --version
+
+min.sh::
+	${HATCH} run cli -i min.toml| sed '/^\s*$$/d' > $@.tmp
+	mv $@.tmp $@
+
+help.txt::
+	${HATCH} run cli --help 2>&1 > $@.tmp
+	mv $@.tmp $@
+
+define adoc
+	asciidoctor -a toc=left -a min-sh=min.sh -a doc-help=help.txt ${2} -o ${1} README.adoc
+endef
+
+doc-html: min.sh help.txt
+	$(call adoc,readme.html)
+
+doc-devel:
+	chokidar --initial '*.adoc' 'min.toml' Makefile -c '${MAKE} doc-html'
+
+readme.docbook:
+	$(call adoc,readme.docbook,-b docbook)
+
+README.md: readme.docbook
+	echo -e "_Generated from [README.adoc](README.adoc)._\n\n" > $@.tmp
+	pandoc -f docbook -t gfm $< -o - >> $@.tmp
+	mv $@.tmp $@
+
+doc-md: README.md
+
+doc: doc-html doc-md
