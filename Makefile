@@ -55,7 +55,7 @@ readme.docbook:
 	$(call adoc,readme.docbook,-b docbook)
 
 README.md: readme.docbook
-	echo -e "_Generated from [source_readme.adoc](source_readme.adoc)._\n\n" > $@.tmp
+	echo -e "# restic-backup-wrapper tool\n\n_Generated from [source_readme.adoc](source_readme.adoc)._\n\n[[toc]]\n\n" > $@.tmp
 	pandoc -f docbook -t gfm $< -o - >> $@.tmp
 	mv $@.tmp $@
 

@@ -1,4 +1,8 @@
+# restic-backup-wrapper tool
+
 _Generated from [source_readme.adoc](source_readme.adoc)._
+
+[[toc]]
 
 
 **restic-backup-wrapper-cli** is a command-line tool that generates
