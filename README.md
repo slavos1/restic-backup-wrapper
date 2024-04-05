@@ -19,8 +19,6 @@ backup data.*
 
 Given a TOML file:
 
-**`min.toml`.**
-
 ``` toml
 # minimal sample config
 relative-to = "~/"
@@ -144,7 +142,7 @@ make local
     <div class="informalexample">
     
     If `relative-to="X"` and a `dir="X/Y"` then the generated command
-    will be `(cd X && restic backup Y …​)`
+    will be `(cd X && restic backup Y …​)`.
     
     </div>
 
@@ -196,9 +194,9 @@ snaphots` where only absolute paths are shown. Running `restic ls
 
 # Writing documentation
 
-When writing documentation, I run `make doc-devel` and preview the
-generated HTML.
+When writing documentation, edit `source_readme.adoc`, run `make
+doc-devel` and preview the generated HTML.
 
-Once ready to commit, I run `make doc` to generate
-[README.md](README.md) file from
-[source\_readme.adoc](source_readme.adoc) (and included files).
+Once ready to commit, run `make doc` to generate [README.md](README.md)
+file from [source\_readme.adoc](source_readme.adoc) (and included
+files).

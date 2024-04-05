@@ -18,7 +18,6 @@ Always review the generated {rt} commands, as improper use could potentially dam
 
 Given a TOML file:
 
-.`min.toml`
 [,toml]
 ----
 include::min.toml[]
@@ -36,7 +35,6 @@ include::{min-sh}[]
 ----
 include::{doc-help}[]
 ----
-
 
 == Prerequisites
 
@@ -104,7 +102,7 @@ I do not use this flag as my `{rt}` is actually a custom alias/wrapper that sets
 If specified, all `dir` paths (see below) that are relative to this path will be backed up as relative.
 +
 ====
-If `relative-to="X"` and a `dir="X/Y"` then the generated command will be `(cd X && {rt} backup Y ...)`
+If `relative-to="X"` and a `dir="X/Y"` then the generated command will be `(cd X && {rt} backup Y ...)`.
 ====
 
 `group-by` {opt}::
@@ -144,7 +142,7 @@ _So one should imagine how `tar` does it._
 
 == Writing documentation
 
-When writing documentation, I run `make doc-devel` and preview the generated HTML.
+When writing documentation, edit `source_readme.adoc`, run `make doc-devel` and preview the generated HTML.
 
-Once ready to commit, I run `make doc` to generate link:README.md[README.md] file from link:source_readme.adoc[source_readme.adoc] (and included files).
+Once ready to commit, run `make doc` to generate link:README.md[README.md] file from link:source_readme.adoc[source_readme.adoc] (and included files).
 
