@@ -1,17 +1,17 @@
-# minimal sample config
+# a sample config
 relative-to = "/home/user"
 group-by = "host,paths,tags"
-# will be added to all backups
-exclude = ['.git']
+# global exclude: will be added to all backups
+exclude = ['.git', '*.py[cd]', '__pycache__']
 
 [my-folder-one]
 dir = "/home/user/my-folder-one"
 tags = ['mobile', 'voice', 'audio']
-exclude = [".hg"]
+exclude = ['.hg']
 
 [folder-with-one-backup]
-dir = "/home/user/my-mail"
-tags = ['email']
+dir = "/home/user/readme.txt"
+tags = ['doc']
 keep-last = 1
 
 [absolute-path]

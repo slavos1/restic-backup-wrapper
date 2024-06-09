@@ -7,23 +7,36 @@
 :cli: restic-backup-wrapper-cli
 :rt: restic
 
-*{cli}* is a command-line tool that generates `{rt} backup` commands from a TOML config file.
+*{cli}* is a command-line tool that generates https://restic.readthedocs.io/en/latest/040_backup.html[`{rt}`] commands from a TOML config file.
 
 The output is suitable for piping to a (Posix) shell.
+If you have the `RESTIC_REPOSITORY` and `RESTIC_PASSWORD` environment variables set up already, you can run it simply as:
+
+[subs=attributes]
+----
+{cli} -l '' -i my-backup.toml | bash -xs
+----
 
 CAUTION: _Please note although this script is provided in the hope it will be link:LICENSE[useful], use caution when running it.
-Always review the generated {rt} commands, as improper use could potentially damage your backup data._
+Always review the generated `{rt}` commands, as improper use could potentially damage your backup data._
 
 == Example
 
-Given a TOML file:
+Given a link:min.toml[TOML file] `min.toml`:
 
 [,toml]
 ----
 include::min.toml[]
 ----
 
-{cli} generates https://restic.readthedocs.io/en/latest/040_backup.html[`{rt} backup`] commands (logs not shown):
+then
+
+[subs=attributes]
+----
+{cli} -l '' -i min.toml
+----
+
+generates `{rt}` commands:
 
 ----
 include::{min-sh}[]
@@ -106,7 +119,7 @@ If `relative-to="X"` and a `dir="X/Y"` then the generated command will be `(cd X
 ====
 
 `group-by` {opt}::
-Translates to --group-by {rt} flag.
+Translates to `--group-by` {rt} flag.
 It will be omitted from the generated command if not specified.
 
 `exclude` {opt}::
@@ -117,7 +130,9 @@ The folder-specific excludes will be merged with this exclude, if any.
 
 Each key of the form `[my-dir]` represents a folder to be backed up and for which a `{rt} backup` command will be generated.
 
-For each such entry, {cli} recognizes these parameters:
+TIP: The key can be an arbitrary string and does not need to match folder/file being backup up.
+
+For each such entry, `{cli}` recognizes these parameters:
 
 `dir` (mandatory)::
 Path to back up; if `relative-to` is set in the global parameters to a path `X`, `dir` will end up backed up as relative to `X` if it is a descendant path of `X`; otherwise it is kept as is.
@@ -142,7 +157,7 @@ _So one should imagine how `tar` does it._
 
 == Writing documentation
 
-When writing documentation, edit `source_readme.adoc`, run `make doc-devel` and preview the generated HTML.
+When writing documentation, edit `source_readme.adoc`, run `make doc-devel` and preview the generated `readme.html`.
 
 Once ready to commit, run `make doc` to generate link:README.md[README.md] file from link:source_readme.adoc[source_readme.adoc] (and included files).
 
