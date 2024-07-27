@@ -17,6 +17,8 @@ STDOUT_DISPLAY_NAME = "<stdout>"
 RESTIC_COMMAND_DEFAULT = "restic"
 THIS_DIR = Path(__file__).parent
 TEMPLATE_NAME = "commands.tmpl"
+# restic option --skip-if-unchanged from 0.17.0
+SKIP_IF_UNCHANGED_DEFAULT = True
 
 
 def is_folder_config(d: Any) -> bool:
@@ -86,7 +88,7 @@ def _generate_command(
             "abs_path": abs_path,
         }
     )
-    ic(key, tvars)
+    logger.debug(ic(key, tvars))
     return tvars
 
 
@@ -98,12 +100,14 @@ def _generate_commands(toml: Path, dry_run: bool = False) -> Dict[str, Any]:
     logger.info("Reading {}", toml)
     with toml.open("rb") as inp:
         d = tomli.load(inp)
+    d.setdefault("skip-if-unchanged", SKIP_IF_UNCHANGED_DEFAULT)
+    d.setdefault("restic-command", RESTIC_COMMAND_DEFAULT)
     logger.debug("d={}", d)
+
     global_settings = _normalize_keys(
         {key: value for key, value in d.items() if not is_folder_config(value)}
     )
-    global_settings.setdefault("restic_command", RESTIC_COMMAND_DEFAULT)
-    ic(global_settings)
+    logger.debug(ic(global_settings))
 
     return {**global_settings, "all_commands": dict(_iter(global_settings))}
 
@@ -124,6 +128,7 @@ def generate(args: Namespace) -> None:
     )
     jinja.filters.update({"repr": repr, "sorted": sorted})
 
+    logger.debug(ic(TEMPLATE_NAME, THIS_DIR))
     print(
         remove_empty_lines(
             jinja.get_template(TEMPLATE_NAME).render(

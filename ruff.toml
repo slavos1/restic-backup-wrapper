@@ -1,4 +1,5 @@
 # add Ruff customization as desired
 line-length = 100
 
+[lint]
 select = ["E", "F", "I"]

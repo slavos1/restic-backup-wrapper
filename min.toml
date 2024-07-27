@@ -4,6 +4,9 @@ group-by = "host,paths,tags"
 # global exclude: will be added to all backups
 exclude = ['.git', '*.py[cd]', '__pycache__']
 
+# assumes restic 0.17.0+; set to false for older releases
+# skip-if-unchanged = true
+
 [my-folder-one]
 dir = "/home/user/my-folder-one"
 tags = ['mobile', 'voice', 'audio']

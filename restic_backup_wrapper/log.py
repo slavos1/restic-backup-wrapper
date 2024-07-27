@@ -63,5 +63,4 @@ def setup_logging(args: Namespace) -> None:
     logger.configure(handlers=handlers)
 
 
-# XXX this explicit export is to make mypy happy
-ic = _ic
+ic = _ic.format

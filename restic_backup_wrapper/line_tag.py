@@ -14,6 +14,7 @@ echo  -e 'a, b'
 will be (removed spaces)
 echo -e 'a, b'
 """
+
 import re
 import shlex
 
