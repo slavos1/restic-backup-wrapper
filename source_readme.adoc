@@ -126,11 +126,6 @@ It will be omitted from the generated command if not specified.
 Add these exclude patterns to every generated command.
 The folder-specific excludes will be merged with this exclude, if any.
 
-`skip-if-unchanged` {opt}::
-Boolean.
-If set to `true` (default) then https://github.com/restic/restic/issues/662[`--skip-if-unchanged`] will be added to all `restic backup` calls.
-Must be set to `false` for `restic` prior to `0.17.0`.
-
 === Backed up folders
 
 Each key of the form `[my-dir]` represents a folder to be backed up and for which a `{rt} backup` command will be generated.
